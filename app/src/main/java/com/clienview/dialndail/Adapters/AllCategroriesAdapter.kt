@@ -6,15 +6,16 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.clienview.dialndail.Model.AllCategoriesModel
+import com.clienview.dialndail.Model.AllCategoryArrayModel
 import com.clienview.dialndail.R
+import com.clienview.dialndail.Utils.PublicUrls
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.allcategoriesitem.view.*
 
 
 class AllCategroriesAdapter(
     val applicationContext: Context,
-    val allCatgryList: ArrayList<AllCategoriesModel>
+    val allCatgryList: ArrayList<AllCategoryArrayModel>
 ) :RecyclerView.Adapter<AllCategroriesAdapter.ViewHolder>() {
 
 
@@ -30,13 +31,11 @@ class AllCategroriesAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model=allCatgryList[position]
-        Picasso.get().load(model.imageurl).into(holder.allImge)
+        Picasso.get().load(PublicUrls.imurl+model.imageurl).into(holder.allImge)
         holder.allText.text=model.title
 
 
     }
-
-
 
     class ViewHolder(itemView:View):RecyclerView.ViewHolder(itemView) {
         val allImge=itemView.allCatImg

@@ -2,22 +2,32 @@ package com.clienview.dialndail.WebUrls
 
 
 
-import com.clienview.dialndail.Model.DesktopBannerModel
-import com.clienview.dialndail.Model.ShopModel
-import com.clienview.dialndail.Model.TvHomeModel
-import com.clienview.dialndail.Utils.PublicUrls
+import com.clienview.dialndail.Model.*
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
+import java.util.HashMap
 
 interface Retrofit {
     @Headers("Accept: application/json", "Content-Type: application/json")
 
+
+    @POST("sliding_image")
     @FormUrlEncoded
-    @POST("desktop_banner")
     fun banner(
-        @Field("id") id: String
-    ): Call<ArrayList<DesktopBannerModel>>
+        @FieldMap params: Map<String,String>
+    ): Call<JsonArray>
+
+
+    @POST("all_category2")
+    fun allcategory(
+    ): Call<ArrayList<AllCategoriesModel>>
+
+    @POST("add_image")
+    fun addimage(
+    ): Call<ArrayList<AddImageModel>>
 
     @FormUrlEncoded
     @POST("media_list")

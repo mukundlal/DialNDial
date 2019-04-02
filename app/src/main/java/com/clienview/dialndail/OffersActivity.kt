@@ -2,13 +2,17 @@ package com.clienview.dialndail
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.design.widget.TabLayout
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import com.clienview.dialndail.Adapters.OffersAdapter
 import com.clienview.dialndail.Model.OffersModel
 import kotlinx.android.synthetic.main.activity_offers.*
 
 class OffersActivity : AppCompatActivity() {
-            val offersArrayList=ArrayList<OffersModel>()
+    private val offersArrayList=ArrayList<OffersModel>()
+    private val tempoffersArrayList=ArrayList<OffersModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_offers)
@@ -41,9 +45,53 @@ class OffersActivity : AppCompatActivity() {
             "Something",
             "",
             "20"))
-
+        tempoffersArrayList.addAll(offersArrayList)
 
         offersRv.layoutManager=StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL)
-        offersRv.adapter=OffersAdapter(applicationContext,offersArrayList)
+        offersRv.adapter=OffersAdapter(applicationContext,tempoffersArrayList)
+        tabLayout.addTab(tabLayout.newTab().setText("ALL"))
+        for (k in 0 until offersArrayList.size) {
+            tabLayout.addTab(tabLayout.newTab().setText(offersArrayList[k].ofrredby))
+        }
+        if (tabLayout.tabCount == 2) {
+            tabLayout.tabMode = TabLayout.MODE_FIXED
+        } else {
+            tabLayout.tabMode = TabLayout.MODE_SCROLLABLE
+        }
+        tabLayout.addOnTabSelectedListener(object :TabLayout.OnTabSelectedListener{
+            override fun onTabReselected(p0: TabLayout.Tab?) {
+
+
+            }
+
+            override fun onTabUnselected(p0: TabLayout.Tab?) {
+
+            }
+
+            override fun onTabSelected(p0: TabLayout.Tab?) {
+                Log.e("position",""+p0!!.position)
+                tempoffersArrayList.clear()
+                if(p0.position==0)
+                {
+                    tempoffersArrayList.addAll(offersArrayList)
+                    offersRv.adapter!!.notifyDataSetChanged()
+                }else
+                {   tempoffersArrayList.clear()
+                    for (w in offersArrayList)
+                    {
+
+                        if (w.ofrredby==offersArrayList[p0.position-1].ofrredby)
+                        {
+                            tempoffersArrayList.add(w)
+                        }
+
+                    }
+                    offersRv.adapter!!.notifyDataSetChanged()
+
+
+                }
+
+            }
+        })
     }
 }

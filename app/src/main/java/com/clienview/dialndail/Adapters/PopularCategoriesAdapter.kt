@@ -6,15 +6,16 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.clienview.dialndail.Model.PopularCategoriesModel
+import com.clienview.dialndail.Model.AllCategoryArrayModel
 import com.clienview.dialndail.R
+import com.clienview.dialndail.Utils.PublicUrls
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.popularcatitem.view.*
 
 
 class PopularCategoriesAdapter(
     val applicationContext: Context,
-    val popularCatArray: ArrayList<PopularCategoriesModel>
+    val popularCatArray: ArrayList<AllCategoryArrayModel>
 ) :RecyclerView.Adapter<PopularCategoriesAdapter.ViewHolder>() {
 
 
@@ -30,7 +31,7 @@ class PopularCategoriesAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val model=popularCatArray[position]
-        Picasso.get().load(model.imageurl).into(holder.catImage)
+        Picasso.get().load(PublicUrls.imurl+model.imageurl).into(holder.catImage)
         holder.catName.text=model.title
 
 

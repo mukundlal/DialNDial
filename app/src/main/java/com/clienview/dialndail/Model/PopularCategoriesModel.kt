@@ -1,4 +1,4 @@
 package com.clienview.dialndail.Model
 
-class PopularCategoriesModel(val id:String, val imageurl:String, val title:String) {
+class PopularCategoriesModel(val id:String, val title:String, val imageurl:String) {
 }

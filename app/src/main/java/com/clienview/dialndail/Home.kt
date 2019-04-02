@@ -9,19 +9,21 @@ import android.support.v4.view.ViewPager
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import com.clienview.dialndail.Adapters.AllCategroriesAdapter
 import com.clienview.dialndail.Adapters.ImageSwipeAdapter
 import com.clienview.dialndail.Adapters.PopularCategoriesAdapter
 import com.clienview.dialndail.Adapters.ShopNowAdapter
-import com.clienview.dialndail.Model.AllCategoriesModel
-import com.clienview.dialndail.Model.DesktopBannerModel
-import com.clienview.dialndail.Model.PopularCategoriesModel
-import com.clienview.dialndail.Model.ShopeNowModel
+import com.clienview.dialndail.Model.*
 import com.clienview.dialndail.Utils.PublicUrls
 import com.clienview.dialndail.WebUrls.Retrofit
 import com.clienview.dialndail.WebUrls.ServiceGenerator
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.app_bar_home.*
 import kotlinx.android.synthetic.main.content_home.*
@@ -29,12 +31,16 @@ import retrofit2.Call
 import retrofit2.Response
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+
 
 class Home : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    var bannerAdsList=ArrayList<DesktopBannerModel>()
+    var bannerAdsList=ArrayList<AddBanerModel>()
+    var addImage=ArrayList<AddImageModel>()
     var allCatgryList=ArrayList<AllCategoriesModel>()
-    var popularCatArray=ArrayList<PopularCategoriesModel>()
+    var popularCatArray=ArrayList<AllCategoryArrayModel>()
+    var allCategoryArray=ArrayList<AllCategoryArrayModel>()
     var shopNowArray=ArrayList<ShopeNowModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,67 +58,110 @@ class Home : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListene
 
         nav_view.setNavigationItemSelectedListener(this)
         addValues()
-        initViews()
         callAddViewApi()
+        callAllCategoryAdapter()
+        callAllSingleAd()
     }
 
     private fun addValues() {
-       allCatgryList.add(AllCategoriesModel("1","https://png.pngtree.com/svg/20161113/ef1b24279e.png","Online"))
-        allCatgryList.add(AllCategoriesModel("1","http://www.stickpng.com/assets/images/58e91965eb97430e819064f5.png","Online"))
-        allCatgryList.add(AllCategoriesModel("1","http://aux.iconspalace.com/uploads/chat-icon-256-1480184508.png","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTeUxmrC179LWZsY1GVQGht1IzcYBFb0nB2jOcxm4HHwSNz5gNDnA","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://memegene.net/sites/default/files/wallpaper/camera-icons/445672/camera-icons-round-445672-844260.png","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://img.xda-cdn.com/W5Nf7RvfUR0y0ZnKxPEL2qZthos=/http%3A%2F%2Fforum.xda-developers.com%2Fattachment.php%3Fattachmentid%3D2822556%26stc%3D1%26d%3D1403977531","Online"))
-        allCatgryList.add(AllCategoriesModel("1","http://www.myiconfinder.com/uploads/iconsets/256-256-4879bd68332575ee287b47c870258beb.png","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSY9fS9dIT6d2N3WvTtdmFWIzcMhwvYrV9pc6O2cdMqqEGZnkPT","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRCb4TNE3i9jZL6gMmYK4rZ_Xw6EWIbk-VFnVielOjzZPOwh3WS","Online"))
-        allCatgryList.add(AllCategoriesModel("1","https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRs4f1sLWjQAhf7cBdHbsIL3hd_TiHy2LjPniDYGmZkOuPWnn4Jgw","Online"))
-
-
-        shopNowArray.add(ShopeNowModel("1","Amazon"))
-        shopNowArray.add(ShopeNowModel("1","Flipkart"))
-        shopNowArray.add(ShopeNowModel("1","Jabong"))
-        shopNowArray.add(ShopeNowModel("1","Minthra"))
-        shopNowArray.add(ShopeNowModel("1","Swiggy"))
-        shopNowArray.add(ShopeNowModel("1","AJIO"))
-        shopNowArray.add(ShopeNowModel("1","GadgetWala"))
-
-        popularCatArray.add(PopularCategoriesModel("1","http://aux.iconspalace.com/uploads/amazon-payment-icon-256.png","Amazone"))
-        popularCatArray.add(PopularCategoriesModel("1","https://banner2.kisspng.com/20180623/hcw/kisspng-flipkart-business-e-commerce-retail-sales-5b2dec230f35c8.8488817015297362270623.jpg","Flipkart"))
-        popularCatArray.add(PopularCategoriesModel("1","https://paulwriter.com/wp-content/uploads/2018/05/myntra.jpg","Mynthra"))
-        popularCatArray.add(PopularCategoriesModel("1","http://www.financebuddy.in/wp-content/uploads/2016/12/ebay-shopping-site.png","Ebay"))
-        popularCatArray.add(PopularCategoriesModel("1","https://cdn.iconscout.com/icon/free/png-256/snapdeal-282408.png","SnapDeal"))
-        popularCatArray.add(PopularCategoriesModel("1","https://i0.wp.com/www.indiaretailing.com/wp-content/uploads/2008/12/Home-shop18.jpg?zoom=2.625&resize=392%2C230&ssl=1","HomeSHope18"))
-
-
-
-
-
 
 
 
     }
-
-    private fun callAddViewApi() {
+    private fun callAllSingleAd() {
 
         val jsonPostService = ServiceGenerator.createService(Retrofit::class.java,PublicUrls.url)
-        val call = jsonPostService.banner("")
-        call.enqueue(object : retrofit2.Callback<ArrayList<DesktopBannerModel>> {
-            override fun onFailure(call: Call<ArrayList<DesktopBannerModel>>, t: Throwable) {
+        val call = jsonPostService.addimage()
+        call.enqueue(object : retrofit2.Callback<ArrayList<AddImageModel>> {
+            override fun onFailure(call: Call<ArrayList<AddImageModel>>, t: Throwable) {
+
+
+                Log.e("resp", "${t.message}")
+
             }
 
             override fun onResponse(
-                call: Call<ArrayList<DesktopBannerModel>>,
-                response: Response<ArrayList<DesktopBannerModel>>
+                call: Call<ArrayList<AddImageModel>>,
+                response: Response<ArrayList<AddImageModel>>
             ) {
-                bannerAdsList=response.body()!!
-                val timmer= Timer()
-                bannerAddsViewPager.adapter=ImageSwipeAdapter(applicationContext,bannerAdsList)
-                tabselector.setupWithViewPager(bannerAddsViewPager,true)
-                timmer.scheduleAtFixedRate(Swiping(this@Home,bannerAddsViewPager,bannerAdsList),2000,3000)
-
+                addImage=response.body()!!
+                Picasso.get().load(PublicUrls.imurl+addImage[0].image).into(singleAddView)
 
             }
+        })
+    }
+    private fun callAllCategoryAdapter() {
+
+        val jsonPostService = ServiceGenerator.createService(Retrofit::class.java,PublicUrls.url)
+        val call = jsonPostService.allcategory()
+        call.enqueue(object : retrofit2.Callback<ArrayList<AllCategoriesModel>> {
+            override fun onFailure(call: Call<ArrayList<AllCategoriesModel>>, t: Throwable) {
+
+
+                Log.e("resp", "${t.message}")
+
+            }
+
+            override fun onResponse(
+                call: Call<ArrayList<AllCategoriesModel>>,
+                response: Response<ArrayList<AllCategoriesModel>>
+            ) {
+                allCatgryList=response.body()!!
+                for (a in allCatgryList){
+                    Log.e("log","${a.id},${a.image},${a.popular}")
+
+                    if (a.popular=="1"){
+
+                        popularCatArray.add(AllCategoryArrayModel(a.id!!,a.name!!,a.image!!))
+                    }else{
+
+                        allCategoryArray.add(AllCategoryArrayModel(a.id!!,a.name!!,a.image!!))
+                    }
+                }
+                if (popularCatArray.size==0){
+                    popularCatRv.visibility=View.GONE
+                    shopNowBtn.visibility=View.GONE
+                    shopeNowRv.visibility=View.GONE
+                }
+                initViews()
+            }
+        })
+    }
+    private fun callAddViewApi() {
+
+        val jsonPostService = ServiceGenerator.createService(Retrofit::class.java,PublicUrls.url)
+       val parms=HashMap<String,String>()
+        parms.put("id","40")
+        val call = jsonPostService.banner(parms)
+        call.enqueue(object : retrofit2.Callback<JsonArray> {
+            override fun onFailure(call: Call<JsonArray>, t: Throwable) {
+                Log.e("resp", "${t.message}")
+            }
+
+            override fun onResponse(call: Call<JsonArray>, response: Response<JsonArray>) {
+                Log.e("resp", "${response.body().toString()}")
+            }
+//            override fun onFailure(call: Call<ArrayList<AddBanerModel>>, t: Throwable) {
+//
+//
+//                Log.e("resp", "${t.message}")
+//
+//            }
+
+//            override fun onResponse(
+//                call: Call<ArrayList<AddBanerModel>>,
+//                response: Response<ArrayList<AddBanerModel>>
+//            ) {
+//
+//                bannerAdsList=response.body()!!
+//                val timmer= Timer()
+//                bannerAddsViewPager.adapter=ImageSwipeAdapter(applicationContext,bannerAdsList)
+//                tabselector.setupWithViewPager(bannerAddsViewPager,true)
+//                timmer.scheduleAtFixedRate(Swiping(this@Home,bannerAddsViewPager,bannerAdsList),2000,3000)
+//
+//            }
+
+
 
 
         })
@@ -126,9 +175,9 @@ class Home : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListene
         allCategoriesThreeRv.layoutManager=LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false)
         popularCatRv.adapter=PopularCategoriesAdapter(applicationContext,popularCatArray)
         shopeNowRv.adapter=ShopNowAdapter(applicationContext,shopNowArray)
-        allCategoriesOneRv.adapter=AllCategroriesAdapter(applicationContext,allCatgryList)
-        allCategoriesTwoRv.adapter=AllCategroriesAdapter(applicationContext,allCatgryList)
-        allCategoriesThreeRv.adapter=AllCategroriesAdapter(applicationContext,allCatgryList)
+        allCategoriesOneRv.adapter=AllCategroriesAdapter(applicationContext,allCategoryArray)
+        allCategoriesTwoRv.adapter=AllCategroriesAdapter(applicationContext,allCategoryArray)
+        allCategoriesThreeRv.adapter=AllCategroriesAdapter(applicationContext,allCategoryArray)
 
 
     }
@@ -184,7 +233,7 @@ class Home : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListene
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
     }
-    class Swiping(val context:Activity, val viewpager: ViewPager, val bannerlist: ArrayList<DesktopBannerModel>) :TimerTask(){
+    class Swiping(val context:Activity, val viewpager: ViewPager, val bannerlist: ArrayList<AddBanerModel>) :TimerTask(){
         override fun run() {
            context. runOnUiThread {
                 if(viewpager.currentItem<bannerlist.size-1){
